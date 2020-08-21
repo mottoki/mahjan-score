@@ -40,11 +40,11 @@ app.layout = html.Div([
 
     html.Div(dcc.Loading([
     dcc.Graph(id='mygraph'),
-    html.Div(html.P('合計点数', style={'padding-left': '20px', })),
+    html.Div(html.P('現在の合計ポイント', style={'padding-left': '20px', })),
     html.Div(id='totalscore', style={'padding-left': '20px', }),
     html.Div(html.P('')),
     dcc.Graph(id='bargraph'),
-    html.Div(html.P('順位合計獲得数', style={'padding-left': '20px', })),
+    html.Div(html.P('各順位の合計獲得数まとめ', style={'padding-left': '20px', })),
     html.Div(id='table', style={'padding-left': '20px', }),
     ])),
 ])
@@ -91,9 +91,9 @@ def update_fig(jsonified_df):
                         line=dict(color=colors[3], width=4)))
 
     fig.update_layout(plot_bgcolor='whitesmoke',
-        title='合計点数の推移',
+        title='合計ポイントの推移',
         xaxis_title='日付',
-        yaxis_title='合計点数',
+        yaxis_title='合計ポイント',
         )
 
     fig.update_layout(legend=dict(
