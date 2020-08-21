@@ -93,7 +93,20 @@ def update_fig(jsonified_df):
     fig.update_layout(plot_bgcolor='whitesmoke',
         title='合計点数の推移',
         xaxis_title='日付',
-        yaxis_title='合計点数')
+        yaxis_title='合計点数',
+        )
+
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1,
+        font=dict(
+            size=16,
+            color="black"
+        ),
+    ))
 
     return fig, html.Table([
         html.Thead(
