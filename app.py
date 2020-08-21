@@ -23,7 +23,12 @@ colors = {
     "text": "#000000"
 }
 
+# Main Dash part
 app.layout = html.Div([
+    html.Div([
+        html.H2("遠隔マージャン対戦成績表"),
+        ], className="topnav"),
+
     dcc.DatePickerRange(
         id='my-date-picker-range',
         min_date_allowed=dt(2020, 3, 1),
@@ -35,8 +40,12 @@ app.layout = html.Div([
 
     html.Div(dcc.Loading([
     dcc.Graph(id='mygraph'),
+    html.Div(html.P('合計点数', style={'padding-left': '20px', })),
+    html.Div(id='totalscore', style={'padding-left': '20px', }),
+    html.Div(html.P('')),
     dcc.Graph(id='bargraph'),
-    html.Div(id='table'),
+    html.Div(html.P('順位合計獲得数', style={'padding-left': '20px', })),
+    html.Div(id='table', style={'padding-left': '20px', }),
     ])),
 ])
 
@@ -53,10 +62,14 @@ def update_output(start_date, end_date):
         players = players.loc[(players['date'] <= end_date)]
     return players.to_json(date_format='iso', orient='split')
 
-@app.callback(Output('mygraph', 'figure'),
+@app.callback([Output('mygraph', 'figure'),
+    Output('totalscore', 'children')],
     [Input('intermediate-value', 'children')])
 def update_fig(jsonified_df):
     players = pd.read_json(jsonified_df, orient='split')
+
+    summed = players.sum()
+
     fig = go.Figure()
     colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
 
@@ -82,7 +95,14 @@ def update_fig(jsonified_df):
         xaxis_title='日付',
         yaxis_title='合計点数')
 
-    return fig
+    return fig, html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in summed.index])
+            ),
+        html.Tbody(
+            html.Tr([html.Td(val) for val in summed])
+            ),
+        ])
 
 @app.callback([Output('bargraph', 'figure'),
     Output('table', 'children')],
