@@ -45,7 +45,19 @@ app.layout = html.Div([
     html.Div(html.P('')),
     dcc.Graph(id='bargraph'),
     html.Div(html.P('各順位の合計獲得数まとめ', style={'padding-left': '20px', })),
-    html.Div(id='table', style={'padding-left': '20px', }),
+    html.Div(id='table', style={'padding-left': '20px', 'padding-bottom': '20px',}),
+    html.Div(html.P('')),
+    html.Div(html.P('月別１位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
+    html.Div(id='firs', style={'padding-left': '20px', }),
+    html.Div(html.P('')),
+    html.Div(html.P('月別2位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
+    html.Div(id='seco', style={'padding-left': '20px', }),
+    html.Div(html.P('')),
+    html.Div(html.P('月別3位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
+    html.Div(id='thir', style={'padding-left': '20px', }),
+    html.Div(html.P('')),
+    html.Div(html.P('月別4位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
+    html.Div(id='four', style={'padding-left': '20px', })
     ])),
 ])
 
@@ -118,7 +130,11 @@ def update_fig(jsonified_df):
         ])
 
 @app.callback([Output('bargraph', 'figure'),
-    Output('table', 'children')],
+    Output('table', 'children'),
+    Output('firs', 'children'),
+    Output('seco', 'children'),
+    Output('thir', 'children'),
+    Output('four', 'children'),],
     [Input('intermediate-value', 'children')])
 def update_standings(jsonified_df):
     players = pd.read_json(jsonified_df, orient='split')
@@ -155,6 +171,18 @@ def update_standings(jsonified_df):
         title_text="順位獲得数の比較",
         showlegend=False)
 
+    # Get summary stats by month
+    standings['date'] = players['date'].dt.to_period('M')
+    g = standings.groupby('date')
+    bm_firs = g['1st'].apply(pd.value_counts).unstack(-1).fillna(0).reset_index()
+    bm_seco = g['2nd'].apply(pd.value_counts).unstack(-1).fillna(0).reset_index()
+    bm_thir = g['3rd'].apply(pd.value_counts).unstack(-1).fillna(0).reset_index()
+    bm_four = g['4th'].apply(pd.value_counts).unstack(-1).fillna(0).reset_index()
+    bm_firs['date'] = bm_firs['date'].dt.strftime('%Y-%m')
+    bm_seco['date'] = bm_seco['date'].dt.strftime('%Y-%m')
+    bm_thir['date'] = bm_thir['date'].dt.strftime('%Y-%m')
+    bm_four['date'] = bm_four['date'].dt.strftime('%Y-%m')
+
     return fig, html.Table([
         html.Thead(
             html.Tr([html.Th(col) for col in summary.columns])
@@ -164,7 +192,43 @@ def update_standings(jsonified_df):
                 html.Td(summary.iloc[i][col]) for col in summary.columns
             ]) for i in range(len(summary['1st']))
         ])
+    ]), html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in bm_firs.columns])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(bm_firs.iloc[i][col]) for col in bm_firs.columns
+            ]) for i in range(len(bm_firs['date']))
+        ])
+    ]), html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in bm_seco.columns])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(bm_seco.iloc[i][col]) for col in bm_seco.columns
+            ]) for i in range(len(bm_seco['date']))
+        ])
+    ]), html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in bm_thir.columns])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(bm_thir.iloc[i][col]) for col in bm_thir.columns
+            ]) for i in range(len(bm_thir['date']))
+        ])
+    ]), html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in bm_four.columns])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(bm_four.iloc[i][col]) for col in bm_four.columns
+            ]) for i in range(len(bm_four['date']))
+        ])
     ])
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
