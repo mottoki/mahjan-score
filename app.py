@@ -36,8 +36,10 @@ app.layout = html.Div([
         end_date=dt.today()
     ),
 
+    # intermediate dataframe does not display in the website
     html.Div(id='intermediate-value', style={'display': 'none'}),
 
+    # Other graph and table that are all callbacks
     html.Div(dcc.Loading([
     dcc.Graph(id='mygraph'),
     html.Div(html.P('現在の合計ポイント', style={'padding-left': '20px', })),
