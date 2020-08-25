@@ -84,6 +84,7 @@ def update_fig(jsonified_df):
 
     summed = players.sum()
 
+    # Figure
     fig = go.Figure()
     colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
 
