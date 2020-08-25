@@ -49,6 +49,7 @@ app.layout = html.Div([
     html.Div(html.P('各順位の合計獲得数まとめ', style={'padding-left': '20px', })),
     html.Div(id='table', style={'padding-left': '20px', 'padding-bottom': '20px',}),
     html.Div(html.P('')),
+    # Monthly review
     html.Div(html.P('月別１位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
     html.Div(id='firs', style={'padding-left': '20px', }),
     html.Div(html.P('')),
