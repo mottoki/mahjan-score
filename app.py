@@ -61,6 +61,7 @@ app.layout = html.Div([
     ])),
 ])
 
+# Callback for data from players_score.pkl
 @app.callback(Output("intermediate-value", "children"),
     [Input("my-date-picker-range", "start_date"),
     Input("my-date-picker-range", "end_date")])
@@ -74,6 +75,7 @@ def update_output(start_date, end_date):
         players = players.loc[(players['date'] <= end_date)]
     return players.to_json(date_format='iso', orient='split')
 
+# Callback for total score graph and table
 @app.callback([Output('mygraph', 'figure'),
     Output('totalscore', 'children')],
     [Input('intermediate-value', 'children')])
@@ -129,6 +131,7 @@ def update_fig(jsonified_df):
             ),
         ])
 
+# Callback for standing winning number graph and tables
 @app.callback([Output('bargraph', 'figure'),
     Output('table', 'children'),
     Output('firs', 'children'),
