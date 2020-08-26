@@ -41,9 +41,16 @@ app.layout = html.Div([
     # Other graph and table that are all callbacks
     dcc.Graph(id='mygraph'),
 
+    # Total score
     html.Div([
             html.Div(html.P('現在の合計ポイント')),
             html.Div(id='totalscore'),
+        ], className="mytablestyle"),
+
+    # Monthly score obtained.
+    html.Div([
+            html.Div(html.P('月別獲得ポイント')),
+            html.Div(id='monthlyscore'),
         ], className="mytablestyle"),
 
     # Bar graph of standings.
@@ -89,11 +96,12 @@ def update_output(start_date, end_date):
 
 # Callback for total score graph and table
 @app.callback([Output('mygraph', 'figure'),
-    Output('totalscore', 'children')],
+    Output('totalscore', 'children'),
+    Output('monthlyscore', 'children')],
     [Input('intermediate-value', 'children')])
 def update_fig(jsonified_df):
     players = pd.read_json(jsonified_df, orient='split')
-
+    # Total
     summed = players.sum()
 
     # Figure
@@ -135,6 +143,11 @@ def update_fig(jsonified_df):
         ),
     ))
 
+    #Monthly sum of points
+    players['date'] = players['date'].dt.to_period('M')
+    month_sum = players.groupby('date').sum().reset_index()
+    month_sum['date'] = month_sum['date'].dt.strftime('%Y-%m')
+
     return fig, html.Table([
         html.Thead(
             html.Tr([html.Th(col) for col in summed.index])
@@ -142,7 +155,16 @@ def update_fig(jsonified_df):
         html.Tbody(
             html.Tr([html.Td(val) for val in summed])
             ),
+        ]), html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in month_sum.columns])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(month_sum.iloc[i][col]) for col in month_sum.columns
+            ]) for i in range(len(month_sum['date']))
         ])
+    ])
 
 # Callback for standing winning number graph and tables
 @app.callback([Output('bargraph', 'figure'),
