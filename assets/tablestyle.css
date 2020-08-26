@@ -1,0 +1,22 @@
+.mytablestyle {
+    margin: auto;
+    width: 80%;
+    padding: 20px;
+}
+
+p {
+    font-size: 23px;
+}
+
+th {
+    font-size: 20px !important;
+    text-align: center !important;
+}
+
+td {
+    font-size: 20px !important;
+    text-align: center !important;
+    vertical-align: middle;
+}
+
+

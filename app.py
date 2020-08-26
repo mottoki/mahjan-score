@@ -27,41 +27,50 @@ colors = {
 app.layout = html.Div([
     html.Div([
         html.H2("遠隔マージャン対戦成績表"),
-        ], className="topnav"),
-
-    dcc.DatePickerRange(
-        id='my-date-picker-range',
-        min_date_allowed=dt(2020, 3, 1),
-        max_date_allowed=dt.today(),
-        end_date=dt.today()
-    ),
+        dcc.DatePickerRange(
+            id='my-date-picker-range',
+            min_date_allowed=dt(2020, 3, 1),
+            max_date_allowed=dt.today(),
+            end_date=dt.today()
+        ),
+        ], className="mytablestyle"),
 
     # intermediate dataframe does not display in the website
     html.Div(id='intermediate-value', style={'display': 'none'}),
 
     # Other graph and table that are all callbacks
-    html.Div(dcc.Loading([
     dcc.Graph(id='mygraph'),
-    html.Div(html.P('現在の合計ポイント', style={'padding-left': '20px', })),
-    html.Div(id='totalscore', style={'padding-left': '20px', }),
-    html.Div(html.P('')),
+
+    html.Div([
+            html.Div(html.P('現在の合計ポイント')),
+            html.Div(id='totalscore'),
+        ], className="mytablestyle"),
+
+    # Bar graph of standings.
     dcc.Graph(id='bargraph'),
-    html.Div(html.P('各順位の合計獲得数まとめ', style={'padding-left': '20px', })),
-    html.Div(id='table', style={'padding-left': '20px', 'padding-bottom': '20px',}),
-    html.Div(html.P('')),
+
+    html.Div([
+        html.Div(html.P('各順位の合計獲得数まとめ')),
+        html.Div(id='table'),
+        ], className="mytablestyle"),
+
     # Monthly review
-    html.Div(html.P('月別１位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
-    html.Div(id='firs', style={'padding-left': '20px', }),
-    html.Div(html.P('')),
-    html.Div(html.P('月別2位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
-    html.Div(id='seco', style={'padding-left': '20px', }),
-    html.Div(html.P('')),
-    html.Div(html.P('月別3位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
-    html.Div(id='thir', style={'padding-left': '20px', }),
-    html.Div(html.P('')),
-    html.Div(html.P('月別4位獲得数', style={'padding-left': '20px', 'padding-top': '20px',})),
-    html.Div(id='four', style={'padding-left': '20px', })
-    ])),
+    html.Div([
+        html.Div(html.P('月別１位獲得数')),
+        html.Div(id='firs'),
+        ], className="mytablestyle"),
+    html.Div([
+        html.Div(html.P('月別2位獲得数')),
+        html.Div(id='seco'),
+        ], className="mytablestyle"),
+    html.Div([
+        html.Div(html.P('月別3位獲得数')),
+        html.Div(id='thir'),
+        ], className="mytablestyle"),
+    html.Div([
+        html.Div(html.P('月別4位獲得数')),
+        html.Div(id='four', style={'padding-bottom': '100px'}),
+        ], className="mytablestyle"),
 ])
 
 # Callback for data from players_score.pkl
