@@ -127,8 +127,8 @@ def update_fig(jsonified_df):
 
     fig.update_layout(plot_bgcolor='whitesmoke',
         title='合計ポイントの推移',
-        xaxis_title='日付',
-        yaxis_title='合計ポイント',
+        # xaxis_title='日付',
+        # yaxis_title='合計ポイント',
         )
 
     fig.update_layout(legend=dict(
@@ -138,10 +138,12 @@ def update_fig(jsonified_df):
         xanchor="right",
         x=1,
         font=dict(
-            size=16,
+            size=18,
             color="black"
-        ),
-    ))
+        ),),
+        font=dict(
+            size=18),
+    )
 
     #Monthly sum of points
     players['date'] = players['date'].dt.to_period('M')
@@ -200,14 +202,20 @@ def update_standings(jsonified_df):
         marker=dict(color=colors, coloraxis="coloraxis1")), row=2, col=2)
 
     # Update yaxis properties
-    fig.update_yaxes(title_text="合計", row=1, col=1)
-    fig.update_yaxes(title_text="合計", row=1, col=2)
-    fig.update_yaxes(title_text="合計", row=2, col=1)
-    fig.update_yaxes(title_text="合計", row=2, col=2)
+    # fig.update_yaxes(title_text="合計", row=1, col=1)
+    # fig.update_yaxes(title_text="合計", row=1, col=2)
+    # fig.update_yaxes(title_text="合計", row=2, col=1)
+    # fig.update_yaxes(title_text="合計", row=2, col=2)
+
+    for i in fig['layout']['annotations']:
+        i['font'] = dict(size=20,color='#708090')
 
     fig.update_layout(
         title_text="順位獲得数の比較",
-        showlegend=False)
+        showlegend=False,
+        font=dict(
+            size=18),
+        )
 
     # Get summary stats by month
     standings['date'] = players['date'].dt.to_period('M')
