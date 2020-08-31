@@ -176,7 +176,7 @@ def update_fig(jsonified_df):
     month_sum = players.groupby('date').sum().reset_index()
     month_sum['date'] = month_sum['date'].dt.strftime('%Y-%m')
 
-    return fig, figtwo, html.Table([
+    return fig, html.Table([
         html.Thead(
             html.Tr([html.Th(col) for col in summed.index])
             ),
@@ -192,7 +192,7 @@ def update_fig(jsonified_df):
                 html.Td(month_sum.iloc[i][col]) for col in month_sum.columns
             ]) for i in range(len(month_sum['date']))
         ])
-    ])
+    ]), figtwo
 
 # Callback for standing winning number graph and tables
 @app.callback([Output('bargraph', 'figure'),
