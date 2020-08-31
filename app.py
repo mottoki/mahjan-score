@@ -53,6 +53,9 @@ app.layout = html.Div([
             html.Div(id='monthlyscore'),
         ], className="mytablestyle"),
 
+    # Distribution plot of score
+    dcc.Graph(id='mydistplot'),
+
     # Bar graph of standings.
     dcc.Graph(id='bargraph'),
 
@@ -96,6 +99,7 @@ def update_output(start_date, end_date):
 
 # Callback for total score graph and table
 @app.callback([Output('mygraph', 'figure'),
+    Output('mydistplot', 'figure'),
     Output('totalscore', 'children'),
     Output('monthlyscore', 'children')],
     [Input('intermediate-value', 'children')])
@@ -150,7 +154,29 @@ def update_fig(jsonified_df):
     month_sum = players.groupby('date').sum().reset_index()
     month_sum['date'] = month_sum['date'].dt.strftime('%Y-%m')
 
-    return fig, html.Table([
+    # Distplots of monthly points
+    hist_data = [players['yukoron'], players['ToShiroh'], players['Shinwan'], players['Mirataro']]
+    group_labels = ['yukoron', 'ToShiroh', 'Shinwan', 'Mirataro']
+    colors = ['lightsalmon', 'plum', 'lightgreen', 'lightblue']
+    figtwo = ff.create_distplot(hist_data, group_labels, show_hist=False, colors=colors)
+    figtwo.update_layout(plot_bgcolor='whitesmoke',
+        title='半荘ごとの獲得ポイントの分布',
+        )
+    figtwo.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1,
+        font=dict(
+            size=18,
+            color="black"
+        ),),
+        font=dict(
+            size=18),
+    )
+
+    return fig, figtwo, html.Table([
         html.Thead(
             html.Tr([html.Th(col) for col in summed.index])
             ),
