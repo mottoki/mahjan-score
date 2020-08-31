@@ -149,11 +149,6 @@ def update_fig(jsonified_df):
             size=18),
     )
 
-    #Monthly sum of points
-    players['date'] = players['date'].dt.to_period('M')
-    month_sum = players.groupby('date').sum().reset_index()
-    month_sum['date'] = month_sum['date'].dt.strftime('%Y-%m')
-
     # Distplots of monthly points
     hist_data = [players['yukoron'], players['ToShiroh'], players['Shinwan'], players['Mirataro']]
     group_labels = ['yukoron', 'ToShiroh', 'Shinwan', 'Mirataro']
@@ -175,6 +170,11 @@ def update_fig(jsonified_df):
         font=dict(
             size=18),
     )
+
+    #Monthly sum of points
+    players['date'] = players['date'].dt.to_period('M')
+    month_sum = players.groupby('date').sum().reset_index()
+    month_sum['date'] = month_sum['date'].dt.strftime('%Y-%m')
 
     return fig, figtwo, html.Table([
         html.Thead(
