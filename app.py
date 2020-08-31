@@ -99,9 +99,9 @@ def update_output(start_date, end_date):
 
 # Callback for total score graph and table
 @app.callback([Output('mygraph', 'figure'),
-    Output('mydistplot', 'figure'),
     Output('totalscore', 'children'),
-    Output('monthlyscore', 'children')],
+    Output('monthlyscore', 'children'),
+    Output('mydistplot', 'figure')],
     [Input('intermediate-value', 'children')])
 def update_fig(jsonified_df):
     players = pd.read_json(jsonified_df, orient='split')
