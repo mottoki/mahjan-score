@@ -11,22 +11,21 @@ import dash_html_components as html
 from dash.dependencies import Output, Input, State
 import json
 import re
+# from fbprophet import Prophet
+# from fbprophet.plot import plot_plotly, plot_components_plotly
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title = "mahjan score"
 
-colors = {
-    "graphBackground": "#F5F5F5",
-    "background": "#ffffff",
-    "text": "#000000"
-}
+# Player's colors --------------------------------------------------
+colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
 
 # Main Dash part
 app.layout = html.Div([
     html.Div([
-        html.H2("遠隔マージャン対戦成績表"),
+        html.H2("遠隔マージャン対戦成績アナライザー"),
         dcc.DatePickerRange(
             id='my-date-picker-range',
             min_date_allowed=dt(2020, 3, 1),
@@ -41,15 +40,18 @@ app.layout = html.Div([
     # Other graph and table that are all callbacks
     dcc.Graph(id='mygraph'),
 
+    # Prediction model
+    # dcc.Graph(id='mypred'),
+
     # Total score
     html.Div([
-            html.Div(html.P('現在の合計ポイント')),
+            html.Div(html.P('現在の総合ポイント')),
             html.Div(id='totalscore'),
         ], className="mytablestyle"),
 
     # Monthly score obtained.
     html.Div([
-            html.Div(html.P('月別獲得ポイント')),
+            html.Div(html.P('月別獲得ポイント（その月に何ポイント獲ったか）')),
             html.Div(id='monthlyscore'),
         ], className="mytablestyle"),
 
@@ -107,31 +109,52 @@ def update_fig(jsonified_df):
     # Total
     summed = players.sum()
 
+    #Prediction
+    # results = []
+
+    # for col in players.columns[1:]:
+    #     subdf = players[['date', col]].rename(columns={'date':'ds', col:'y'})
+    #     subdf['ds'] = subdf['ds'].dt.tz_convert(None)
+    #     subdf['ds'] = pd.to_datetime(subdf['ds'])
+    #     subdf['y'] = np.array(subdf['y']).cumsum()
+    #     m = Prophet(daily_seasonality = True)
+    #     m.fit(subdf)
+    #     future = m.predict(m.make_future_dataframe(periods=30))
+    #     dff = future[['ds', 'yhat']].rename(columns={'ds':'ds', 'yhat':col})
+    #     results.append(dff)
+    # forecast = pd.concat(results, axis=1)
+    # forecast = forecast.loc[:,~forecast.columns.duplicated()]
+    # fig1 = go.Figure()
+    # colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
+
+    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['Mirataro']),
+    #                     mode='lines',
+    #                     name='Mirataro',
+    #                     line=dict(color=colors[0], width=4)))
+    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['Shinwan']),
+    #                     mode='lines',
+    #                     name='Shinwan',
+    #                     line=dict(color=colors[1], width=4)))
+    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['ToShiroh']),
+    #                     mode='lines',
+    #                     name='ToShiroh',
+    #                     line=dict(color=colors[2], width=4)))
+    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['yukoron']),
+    #                     mode='lines',
+    #                     name='yukoron',
+    #                     line=dict(color=colors[3], width=4)))
+
     # Figure
     fig = go.Figure()
-    colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
 
-    fig.add_trace(go.Scatter(x=players.date, y=np.array(players['Mirataro']).cumsum(),
-                        mode='lines',
-                        name='Mirataro',
-                        line=dict(color=colors[0], width=4)))
-    fig.add_trace(go.Scatter(x=players.date, y=np.array(players['Shinwan']).cumsum(),
-                        mode='lines',
-                        name='Shinwan',
-                        line=dict(color=colors[1], width=4)))
-    fig.add_trace(go.Scatter(x=players.date, y=np.array(players['ToShiroh']).cumsum(),
-                        mode='lines',
-                        name='ToShiroh',
-                        line=dict(color=colors[2], width=4)))
-    fig.add_trace(go.Scatter(x=players.date, y=np.array(players['yukoron']).cumsum(),
-                        mode='lines',
-                        name='yukoron',
-                        line=dict(color=colors[3], width=4)))
+    for i, name in enumerate(players.columns[1:]):
+        fig.add_trace(go.Scatter(x=players.date, y=np.array(players[name]).cumsum(),
+                            mode='lines',
+                            name=name,
+                            line=dict(color=colors[i], width=4)))
 
     fig.update_layout(plot_bgcolor='whitesmoke',
         title='合計ポイントの推移',
-        # xaxis_title='日付',
-        # yaxis_title='合計ポイント',
         )
 
     fig.update_layout(legend=dict(
@@ -171,21 +194,21 @@ def update_fig(jsonified_df):
         ])
     ])
 
-# Callback for total score graph and table
+# Callback for distribution plot for all hanchan score
 @app.callback(Output('mydistplot', 'figure'),
     [Input('intermediate-value', 'children')])
 def update_fig(jsonified_df):
     players = pd.read_json(jsonified_df, orient='split')
 
     # Distplots of monthly points
-    hist_data = [players['yukoron'], players['ToShiroh'], players['Shinwan'], players['Mirataro']]
-    group_labels = ['yukoron', 'ToShiroh', 'Shinwan', 'Mirataro']
-    colors = ['lightsalmon', 'plum', 'lightgreen', 'lightblue']
+    hist_data = [players[name] for name in players.columns[1:]]
+    group_labels = [name for name in players.columns[1:]]
     fig = ff.create_distplot(hist_data, group_labels, show_hist=False, colors=colors)
     fig.update_layout(plot_bgcolor='whitesmoke',
         title='半荘ごとの獲得ポイントの分布',
         )
     fig.update_layout(legend=dict(
+        traceorder="normal",
         orientation="h",
         yanchor="bottom",
         y=1.02,
@@ -213,14 +236,13 @@ def update_standings(jsonified_df):
     players = pd.read_json(jsonified_df, orient='split')
 
     # Get summary stats for standings
-    onlyplayers = players[['ToShiroh', 'Shinwan', 'yukoron', 'Mirataro']]
+    onlyplayers = players[[name for name in players.columns[1:]]]
     arr = np.argsort(-onlyplayers.values, axis=1)
     standings = pd.DataFrame(onlyplayers.columns[arr], index=onlyplayers.index)
     standings = standings.rename(columns={0:'1st', 1:'2nd', 2:'3rd', 3:'4th'})
     summary = standings.stack().groupby(level=[1]).value_counts().unstack(0, fill_value=0).reset_index()
 
     #Subplots
-    colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
     fig = make_subplots(
         rows=2, cols=2,
         subplot_titles=("１位", "２位", "３位", "４位"))
@@ -244,6 +266,7 @@ def update_standings(jsonified_df):
         i['font'] = dict(size=20,color='#708090')
 
     fig.update_layout(
+        plot_bgcolor='whitesmoke',
         title_text="順位獲得数の比較",
         showlegend=False,
         font=dict(
