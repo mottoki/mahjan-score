@@ -11,8 +11,6 @@ import dash_html_components as html
 from dash.dependencies import Output, Input, State
 import json
 import re
-# from fbprophet import Prophet
-# from fbprophet.plot import plot_plotly, plot_components_plotly
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -22,8 +20,11 @@ app.title = "mahjan score"
 # Player's colors --------------------------------------------------
 colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
 
+dselection = ['半荘別ポイント', '月別ポイント']
+
 # Main Dash part
 app.layout = html.Div([
+    # pick date range
     html.Div([
         html.H2("遠隔マージャン対戦成績アナライザー"),
         dcc.DatePickerRange(
@@ -34,14 +35,21 @@ app.layout = html.Div([
         ),
         ], className="mytablestyle"),
 
+    # pick the data type
+    html.Div([
+        dcc.RadioItems(
+        id='datatype',
+        options=[{'label': i, 'value': i} for i in dselection],
+        value=dselection[0],
+        labelStyle={'display': 'inline-block'}
+        ),
+    ], className="mytablestyle"),
+
     # intermediate dataframe does not display in the website
     html.Div(id='intermediate-value', style={'display': 'none'}),
 
     # Other graph and table that are all callbacks
     dcc.Graph(id='mygraph'),
-
-    # Prediction model
-    # dcc.Graph(id='mypred'),
 
     # Total score
     html.Div([
@@ -103,46 +111,16 @@ def update_output(start_date, end_date):
 @app.callback([Output('mygraph', 'figure'),
     Output('totalscore', 'children'),
     Output('monthlyscore', 'children')],
-    [Input('intermediate-value', 'children')])
-def update_fig(jsonified_df):
+    [Input('intermediate-value', 'children'),
+    Input('datatype', 'value')])
+def update_fig(jsonified_df, data_type):
     players = pd.read_json(jsonified_df, orient='split')
-    # Total
-    summed = players.sum()
-
-    #Prediction
-    # results = []
-
-    # for col in players.columns[1:]:
-    #     subdf = players[['date', col]].rename(columns={'date':'ds', col:'y'})
-    #     subdf['ds'] = subdf['ds'].dt.tz_convert(None)
-    #     subdf['ds'] = pd.to_datetime(subdf['ds'])
-    #     subdf['y'] = np.array(subdf['y']).cumsum()
-    #     m = Prophet(daily_seasonality = True)
-    #     m.fit(subdf)
-    #     future = m.predict(m.make_future_dataframe(periods=30))
-    #     dff = future[['ds', 'yhat']].rename(columns={'ds':'ds', 'yhat':col})
-    #     results.append(dff)
-    # forecast = pd.concat(results, axis=1)
-    # forecast = forecast.loc[:,~forecast.columns.duplicated()]
-    # fig1 = go.Figure()
-    # colors = ['lightblue', 'lightgreen', 'plum', 'lightsalmon']
-
-    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['Mirataro']),
-    #                     mode='lines',
-    #                     name='Mirataro',
-    #                     line=dict(color=colors[0], width=4)))
-    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['Shinwan']),
-    #                     mode='lines',
-    #                     name='Shinwan',
-    #                     line=dict(color=colors[1], width=4)))
-    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['ToShiroh']),
-    #                     mode='lines',
-    #                     name='ToShiroh',
-    #                     line=dict(color=colors[2], width=4)))
-    # fig1.add_trace(go.Scatter(x=forecast.ds, y=np.array(forecast['yukoron']),
-    #                     mode='lines',
-    #                     name='yukoron',
-    #                     line=dict(color=colors[3], width=4)))
+    # Convert players dataframe if data type is selected as monthly type
+    if data_type == dselection[1]:
+        #Monthly sum of points
+        players['date'] = players['date'].dt.to_period('M')
+        players = players.groupby('date').sum().reset_index()
+        players['date'] = players['date'].dt.strftime('%Y-%m')
 
     # Figure
     fig = go.Figure()
@@ -171,7 +149,14 @@ def update_fig(jsonified_df):
             size=18),
     )
 
+    # Reinstall the original dataframe for data table
+    players = pd.read_json(jsonified_df, orient='split')
+
+    # Total
+    summed = players.sum()
+
     #Monthly sum of points
+    players = pd.read_json(jsonified_df, orient='split')
     players['date'] = players['date'].dt.to_period('M')
     month_sum = players.groupby('date').sum().reset_index()
     month_sum['date'] = month_sum['date'].dt.strftime('%Y-%m')
@@ -333,4 +318,4 @@ def update_standings(jsonified_df):
     ])
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
