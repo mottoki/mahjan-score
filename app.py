@@ -26,7 +26,7 @@ dselection = ['半荘別ポイント', '月別ポイント']
 app.layout = html.Div([
     # pick date range
     html.Div([
-        html.H2("遠隔マージャン対戦成績アナライザー"),
+        html.H2("麻雀成績アナライザー"),
         dcc.DatePickerRange(
             id='my-date-picker-range',
             min_date_allowed=dt(2020, 3, 1),
