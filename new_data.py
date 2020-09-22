@@ -76,12 +76,12 @@ if len(dfs[0]) > 0:
     concat_score.to_pickle(f"{current_dir}/players_score.pkl")
 
     # push the new data to github page no success.
-    cp = cmd.run(f"git -C {current_dir} add new_data.py", check=True, shell=True)
+    cp = cmd.run(f"git -C {current_dir} add players_score.pkl", check=True, shell=True)
     print("Successful git add command")
-    cp = cmd.run(f"git -C {current_dir} commit -m '7th test modification'", check=True, shell=True)
+    cp = cmd.run(f"git -C {current_dir} commit -m 'scoresheet updated on {new_date}'", check=True, shell=True)
     print("Successful git commit command")
     try:
-        cp = cmd.run(f"git -C {current_dir} push git@github.com:mottoki/mahjan-score.git master", check=True, shell=True)
+        cp = cmd.run(f"git -C {current_dir} push origin master", check=True, shell=True)
         print('Successful upload to Github!')
     except Exception as e: print(e)
 
