@@ -78,7 +78,7 @@ if len(dfs[0]) > 0:
     print("Successful git add command")
     cp = cmd.run(f"cd / && cd {current_dir} && git commit -m 'scoresheet updated on {new_date}'", check=True, shell=True)
     print("Successful git commit command")
-    cp = cmd.run(f"cd / && cd {current_dir} && git push origin master", check=True, shell=True)
+    cp = cmd.run(f"cd / && cd {current_dir} && git push https://github.com/mottoki/mahjan-score.git master", check=True, shell=True)
     print('Successful upload to Github!')
 
     # Move the file with our data to data folder
