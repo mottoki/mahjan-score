@@ -16,6 +16,8 @@ print('Script ran on: ', new_date)
 url = "https://tenhou.net/sc/raw/dat/"+f"sca{new_date}.log.gz"
 filename = f"sca{new_date}.log.gz"
 print('Filename: ', filename)
+
+# Current_dir for the folder name
 current_dir = os.getcwd()
 print('Current Dir: ', current_dir)
 
