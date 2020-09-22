@@ -74,11 +74,11 @@ if len(dfs[0]) > 0:
     concat_score.to_pickle(f"{current_dir}/players_score.pkl")
 
     # push the new data to github page.
-    cp = cmd.run(f"cd {current_dir} && git add players_score.pkl", check=True, shell=True)
+    cp = cmd.run(f"cd / && cd {current_dir} && git add players_score.pkl", check=True, shell=True)
     print("Successful git add command")
-    cp = cmd.run(f"cd {current_dir} && git commit -m 'scoresheet updated on {new_date}'", check=True, shell=True)
+    cp = cmd.run(f"cd / && cd {current_dir} && git commit -m 'scoresheet updated on {new_date}'", check=True, shell=True)
     print("Successful git commit command")
-    cp = cmd.run(f"cd {current_dir} && git push origin master", check=True, shell=True)
+    cp = cmd.run(f"cd / && cd {current_dir} && git push origin master", check=True, shell=True)
     print('Successful upload to Github!')
 
     # Move the file with our data to data folder
