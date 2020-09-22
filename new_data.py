@@ -75,7 +75,7 @@ if len(dfs[0]) > 0:
     # Pickle the new combined data.
     concat_score.to_pickle(f"{current_dir}/players_score.pkl")
 
-    # push the new data to github page no success. test5
+    # push the new data to github page no success. test6
     cp = cmd.run(f"cd / && cd {current_dir} && git add players_score.pkl", check=True, shell=True)
     print("Successful git add command")
     cp = cmd.run(f"cd / && cd {current_dir} && git commit -m 'scoresheet updated on {new_date}'", check=True, shell=True)
